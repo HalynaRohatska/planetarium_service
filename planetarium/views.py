@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db.models import F, Count
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -11,6 +12,7 @@ from planetarium.models import (
     PlanetariumDome, ShowTheme, AstronomyShow,
     ShowSession, Reservation
 )
+from planetarium.schemas import astronomy_show_list_schema, show_session_list_schema
 from planetarium.serializers import (
     PlanetariumDomeSerializer,
     ShowThemeSerializer,
@@ -54,23 +56,23 @@ class AstronomyShowViewSet(
     serializer_class = AstronomyShowSerializer
 
     @staticmethod
-    def _params_to_ints(qs: list[str]) -> list[int]:
+    def _params_to_ints(query_str: list[str]) -> list[int]:
         """Converts a list of string IDs to a list of integers"""
-        return [int(str_id) for str_id in qs.split(",")]
+        return [int(str_id) for str_id in query_str.split(",")]
 
     def get_queryset(self):
         """Retrieve the movies with filters"""
         title = self.request.query_params.get("title")
-        planetarium_dome = self.request.query_params.get("planetarium_dome")
+        show_themes = self.request.query_params.get("show_themes")
 
         queryset = self.queryset
 
         if title:
             queryset = queryset.filter(title__icontains=title)
 
-        if planetarium_dome:
-            planetarium_dome_ids = self._params_to_ints(planetarium_dome)
-            queryset = queryset.filter(planetarium_dome__id__in=planetarium_dome_ids)
+        if show_themes:
+            show_theme_ids = self._params_to_ints(show_themes)
+            queryset = queryset.filter(show_themes__id__in=show_theme_ids)
 
         return queryset.distinct()
 
@@ -99,6 +101,10 @@ class AstronomyShowViewSet(
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @astronomy_show_list_schema()
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class ShowSessionViewSet(viewsets.ModelViewSet):
@@ -138,6 +144,15 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
 
         return ShowSessionSerializer
 
+    @show_session_list_schema()
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+
+class ReservationPagination(PageNumberPagination):
+    page_size = 5
+    max_page_size = 100
+
 
 class ReservationViewSet(
     mixins.ListModelMixin,
@@ -149,6 +164,7 @@ class ReservationViewSet(
         "tickets__show_session__planetarium_dome"
     )
     serializer_class = ReservationSerializer
+    pagination_class = ReservationPagination
 
     def get_queryset(self):
         return Reservation.objects.filter(user=self.request.user)
