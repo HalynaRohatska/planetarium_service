@@ -1,6 +1,5 @@
 from django.db import transaction
 from rest_framework import serializers
-# from rest_framework.exceptions import ValidationError
 
 from planetarium.models import (
     PlanetariumDome,
@@ -44,7 +43,7 @@ class AstronomyShowListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AstronomyShow
-        fields = ("id", "title", "description", "image", "show_themes")
+        fields = ("id", "title", "image", "show_themes")
 
 
 class AstronomyShowDetailSerializer(AstronomyShowSerializer):
@@ -65,6 +64,9 @@ class ShowSessionListSerializer(ShowSessionSerializer):
     show_title = serializers.CharField(
         source="astronomy_show.title", read_only=True
     )
+    show_image = serializers.ImageField(
+        source="astronomy_show.image", read_only=True
+    )
     planetarium_dome_name = serializers.CharField(
         source="planetarium_dome.name", read_only=True
     )
@@ -72,15 +74,12 @@ class ShowSessionListSerializer(ShowSessionSerializer):
         source="planetarium_dome.capacity", read_only=True
     )
     tickets_available = serializers.IntegerField(read_only=True)
-    show_image = serializers.ImageField(
-        source="astronomy_show.image", read_only=True
-    )
 
     class Meta:
         model = ShowSession
         fields = (
             "id", "show_time", "show_title",
-            "planetarium_dome_name","planetarium_dome_capacity",
+            "planetarium_dome_name", "planetarium_dome_capacity",
             "tickets_available", "show_image"
         )
 
