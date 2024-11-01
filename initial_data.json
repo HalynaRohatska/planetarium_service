@@ -1,0 +1,99 @@
+[
+    {
+      "model": "user.user",
+      "pk": 1,
+      "fields": {
+        "password": "hashed_password",
+        "email": "testuser@example.com",
+        "is_staff": false,
+        "is_active": true
+      }
+    },
+    {
+        "model": "planetarium.planetariumdome",
+        "pk": 1,
+        "fields": {
+            "name": "Main Dome",
+            "rows": 10,
+            "seats_in_row": 12
+        }
+    },
+    {
+        "model": "planetarium.showtheme",
+        "pk": 1,
+        "fields": {
+            "name": "Galaxies"
+        }
+    },
+    {
+        "model": "planetarium.showtheme",
+        "pk": 2,
+        "fields": {
+            "name": "Planets"
+        }
+    },
+    {
+        "model": "planetarium.astronomyshow",
+        "pk": 1,
+        "fields": {
+            "title": "The Wonders of the Universe",
+            "description": "An immersive journey through galaxies and stars.",
+            "image": null
+        }
+    },
+    {
+        "model": "planetarium.astronomyshow",
+        "pk": 2,
+        "fields": {
+            "title": "Exploring the Planets",
+            "description": "A detailed exploration of our solar system.",
+            "image": null
+        }
+    },
+    {
+        "model": "planetarium.showsession",
+        "pk": 1,
+        "fields": {
+            "show_time": "2024-11-01T19:00:00Z",
+            "astronomy_show": 1,
+            "planetarium_dome": 1
+        }
+    },
+    {
+        "model": "planetarium.showsession",
+        "pk": 2,
+        "fields": {
+            "show_time": "2024-11-01T20:30:00Z",
+            "astronomy_show": 2,
+            "planetarium_dome": 1
+        }
+    },
+    {
+        "model": "planetarium.reservation",
+        "pk": 1,
+        "fields": {
+            "created_at": "2024-10-01T12:00:00Z",
+            "user": 1
+        }
+    },
+    {
+        "model": "planetarium.ticket",
+        "pk": 1,
+        "fields": {
+            "row": 1,
+            "seat": 5,
+            "show_session": 1,
+            "reservation": 1
+        }
+    },
+    {
+        "model": "planetarium.ticket",
+        "pk": 2,
+        "fields": {
+            "row": 2,
+            "seat": 8,
+            "show_session": 2,
+            "reservation": 1
+        }
+    }
+]
