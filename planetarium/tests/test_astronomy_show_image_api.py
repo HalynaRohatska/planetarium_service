@@ -65,7 +65,7 @@ def detail_url(astronomy_show_id):
     )
 
 
-class MovieImageUploadTests(TestCase):
+class PlanetariumImageUploadTests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_superuser(
@@ -100,27 +100,6 @@ class MovieImageUploadTests(TestCase):
         res = self.client.post(url, {"image": "not image"}, format="multipart")
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_post_image_to_astronomy_show_list(self):
-        url = ASTRONOMY_SHOW_URL
-        with tempfile.NamedTemporaryFile(suffix=".jpg") as ntf:
-            image = Image.new("RGB", (20, 20))
-            image.save(ntf, format="JPEG")
-            ntf.seek(0)
-            res = self.client.post(
-                url,
-                {
-                    "title": "Title show",
-                    "description": "description",
-                    "show_themes": [1],
-                    "image": ntf,
-                },
-                format="multipart",
-            )
-
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        astronomy_show = AstronomyShow.objects.get(title="Title show")
-        self.assertFalse(astronomy_show.image)
 
     def test_image_url_is_shown_on_astronomy_show_detail(self):
         url = image_upload_url(self.astronomy_show.id)
