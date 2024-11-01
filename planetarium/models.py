@@ -1,10 +1,8 @@
-import os
-import uuid
-
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.text import slugify
+
+from planetarium.utils import astronomy_show_image_file_path
 
 
 class PlanetariumDome(models.Model):
@@ -27,13 +25,6 @@ class ShowTheme(models.Model):
         return self.name
 
 
-def astronomy_show_image_file_path(instance, filename):
-    _, extension = os.path.splitext(filename)
-    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
-
-    return os.path.join("uploads/movies/", filename)
-
-
 class AstronomyShow(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -49,8 +40,16 @@ class AstronomyShow(models.Model):
 
 class ShowSession(models.Model):
     show_time = models.DateTimeField()
-    astronomy_show = models.ForeignKey(AstronomyShow, on_delete=models.CASCADE)
-    planetarium_dome = models.ForeignKey(PlanetariumDome, on_delete=models.CASCADE)
+    astronomy_show = models.ForeignKey(
+        AstronomyShow,
+        on_delete=models.CASCADE,
+        related_name="show_session"
+    )
+    planetarium_dome = models.ForeignKey(
+        PlanetariumDome,
+        on_delete=models.CASCADE,
+        related_name="show_session"
+    )
 
     class Meta:
         ordering = ["-show_time"]
@@ -62,7 +61,9 @@ class ShowSession(models.Model):
 class Reservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="reservations"
     )
 
     class Meta:
